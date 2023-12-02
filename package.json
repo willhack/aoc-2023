@@ -1,6 +1,6 @@
 {
   "name": "aoc-2023",
-  "module": "index.ts",
+  "module": "day1.ts",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
