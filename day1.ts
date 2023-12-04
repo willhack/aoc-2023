@@ -1,4 +1,4 @@
-import { getInput } from "./utils";
+import { getInput, nummable } from "./utils";
 
 const input = await getInput(1);
 
@@ -12,8 +12,6 @@ const input = await getInput(1);
 //   "zoneight234",
 //   "7pqrstsixteen",
 // ]; // 281
-
-const nummable = (char: string) => !Number.isNaN(+char);
 
 const filterNums = (str: string) =>
   str.split("").reduce((temp, char) => (nummable(char) ? temp + char : temp), "") || "0";

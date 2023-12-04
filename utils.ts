@@ -4,3 +4,8 @@ export async function getInput(day: number) {
   });
   return (await res.text()).trim().split("\n");
 }
+
+export const nummable = (char: string) => !Number.isNaN(+char);
+
+export const truthyCounter = <T>(arr: T[], booleanFn: (args: T) => boolean) =>
+  arr.reduce((acc, cur) => (booleanFn(cur) ? acc + 1 : acc), 0);
