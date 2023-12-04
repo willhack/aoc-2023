@@ -15,45 +15,70 @@ const input = await getInput(3);
 //   ".664.598..",
 // ];
 
-const isSymbol = (char: string) => !nummable(char) && char !== undefined && char !== ".";
+const isSymbol = (char?: string) => char !== undefined && !nummable(char) && char !== ".";
 
-function neighorMapper(map: string[], i: number, j: number) {
-  const t = map[i - 1]?.[j];
-  const rt = map[i - 1]?.[j + 1];
-  const r = map[i][j + 1];
-  const rb = map[i + 1]?.[j + 1];
-  const b = map[i + 1]?.[j];
-  const lb = map[i + 1]?.[j - 1];
-  const l = map[i][j - 1];
-  const lt = map[i - 1]?.[j - 1];
+function neighorMapper(arr: string[], i: number, j: number) {
+  const neighorsMap = {
+    t: [i - 1, j],
+    rt: [i - 1, j + 1],
+    r: [i, j + 1],
+    rb: [i + 1, j + 1],
+    b: [i + 1, j],
+    lb: [i + 1, j - 1],
+    l: [i, j - 1],
+    lt: [i - 1, j - 1],
+  };
 
-  return (fn: (char: string) => boolean) => truthyCounter<string>([t, rt, r, rb, b, lb, l, lt], fn);
+  return Object.values(neighorsMap).reduce((acc: Record<string, string | undefined>, [ii, jj]) => {
+    acc[`${ii}${jj}`] = arr[ii]?.[jj];
+    return acc;
+  }, {});
 }
 
 function islandRunner(arr: string[]) {
+  const gearLink: Record<keyof ReturnType<typeof neighorMapper>, string[]> = {};
   const parts: string[] = [];
   let symbolFound = false;
   let part = "";
+  let starLocation = "";
 
   for (let i = 0; i < arr.length; i++) {
     for (let j = 0; j < arr[i].length; j++) {
       const cur = arr[i][j];
-      const neigborCounter = neighorMapper(arr, i, j);
+      const mappedNeighors = neighorMapper(arr, i, j);
+
+      // part 2
+      Object.entries(mappedNeighors).forEach(([k, v]) => {
+        if (nummable(cur) && v === "*" && !starLocation) starLocation = k;
+      });
 
       if (!nummable(cur)) {
-        if (part.length && symbolFound) parts.push(part);
+        if (part && symbolFound) parts.push(part);
+        if (part && starLocation) {
+          if (!gearLink[starLocation]) gearLink[starLocation] = [];
+          gearLink[starLocation].push(part);
+        }
         symbolFound = false;
         part = "";
+        starLocation = "";
         continue;
       }
       part += cur;
 
+      // part 1
       if (symbolFound) continue;
-      if (neigborCounter(isSymbol)) symbolFound = true;
+      if (truthyCounter<string | undefined>(Object.values(mappedNeighors), isSymbol))
+        symbolFound = true;
     }
   }
-  return parts;
+  return { parts, gearLink };
 }
 
-const part1Total = islandRunner(input).reduce((a, b) => +a + +b, 0);
-console.log(part1Total);
+const { parts, gearLink } = islandRunner(input);
+
+const part1 = parts.reduce((a, b) => +a + +b, 0);
+const part2 = Object.values(gearLink)
+  .filter((v) => v.length === 2)
+  .reduce((acc, cur) => acc + +cur[0] * +cur[1], 0);
+
+console.log({ part1, part2 });
