@@ -17,32 +17,26 @@ const input = await getInput(11);
 
 const EXPANSION = 1000000 - 1;
 
-function generateGalaxyList(input: string[]) {
+function generateUniversalLists(universe: string[]) {
   const galaxyList: [number, number][] = [];
-  for (let y = 0; y < input.length; y++) {
-    for (let x = 0; x < input[y].length; x++) {
-      if (input[y][x] === "#") galaxyList.push([x, y]);
+  const expandedX: number[] = [];
+  const expandedY: number[] = [];
+
+  for (let y = 0; y < universe.length; y++) {
+    if (!universe[y].includes("#")) expandedY.push(y);
+
+    for (let x = 0; x < universe[y].length; x++) {
+      if (universe[y][x] === "#") galaxyList.push([x, y]);
+
+      if (universe.every((row) => row[x] === ".")) {
+        expandedX.push(x);
+      }
     }
   }
-  return galaxyList;
+  return { expandedX, expandedY, galaxyList };
 }
 
-const galaxyList = generateGalaxyList(input);
-
-const expandedX: number[] = [];
-const expandedY: number[] = [];
-
-for (let x = 0; x < input[0].length; x++) {
-  if (input.every((row) => row[x] === ".")) {
-    expandedX.push(x);
-  }
-}
-
-input.forEach((row, y) => {
-  if (!row.includes("#")) {
-    expandedY.push(y);
-  }
-});
+const { expandedX, expandedY, galaxyList } = generateUniversalLists(input);
 
 let totalDistance = 0;
 for (let i = 0; i < galaxyList.length - 1; i++) {
@@ -62,8 +56,3 @@ for (let i = 0; i < galaxyList.length - 1; i++) {
 }
 
 console.log(totalDistance);
-
-// part1 9805264 answer
-
-// too high 2796599313052
-// too high 2796597898886
